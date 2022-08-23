@@ -3,7 +3,7 @@ import os
 def convert():
     # ask user if they want to convert a file or folder
     while True:
-        conversionType = input("Do you want to convert a file or a folder (enter file/folder): ")
+        conversionType = input("Do you want to convert a file or a folder (enter file/folder): ").strip()
         if(conversionType == "file"):
             convertSingleFile()
             break
@@ -15,7 +15,7 @@ def convert():
 def convertSingleFile():
     # entering the file names
     firstfile = input("Enter the name of the file to convert: ")
-    secondfile = firstfile.split('.')[0] + "_calc.dfy"
+    secondfile = firstfile.split('.')[0] + "_calc.dfyp"
 
     # enter the directory to store the conversion
     #directory = input("Enter the name of directory to save the conversion to (enter nothing to be saved in currect directory): ")
@@ -23,64 +23,73 @@ def convertSingleFile():
     # opening first file in append mode and second file in read mode
     f1 = open(firstfile, 'r')
     f2 = open(secondfile, 'a+')
+
+    # convert f1 into f2
+    convertFile(f1, f2)
+
+    print("The converted file is called " + secondfile)
+
+
+def convertMultipleFiles(firstfile, folder):
     
+    secondfile = folder + "\\" + firstfile.split('.')[0].split('\\')[-1] + "_calc.dfyp"
+
+    # opening first file in append mode and second file in read mode
+    # opening first file in append mode and second file in read mode
+    f1 = open(firstfile, 'r')
+    f2 = open(secondfile, 'a+')
+
+    # convert f1 into f2
+    convertFile(f1, f2)
+
+
+def convertFile(f1, f2):
+
     # appending the contents of the second file to the first file
     f2.write("calc == {\n")
 
     copyNextLine = False
+    firstLine = True
+    offset = 0
     # read content from first file
     for line in f1:
+        
+        # count number of whitespaces
+        count = 0
+        for char in line:
+            if(char != " "):
+                break
+            count += 1 
+
+        # removes all whitespaces from leading and trailing ends
+        line = line.strip() + "\n"
+
+        # offset all lines according to the first proof    
+        if(line.startswith("proof ") and firstLine is True):
+            if(count < 4):
+                offset = 4 - count
+            if(count > 4):
+                offset = count - 4
+            firstLine = False
 
         # copy the next line if the proof stmt is on multiple lines
         if(copyNextLine):
-            f2.write("    " + line)
+            f2.write(" " * (count + offset) + line)
 
             # check if proof line has finished
-            if(line.endswith(";\n")):
+            if(";" in line):
                 copyNextLine = False
 
         # check if line is a proof
         if(line.startswith("proof ")):  
             # append content to second file
-            f2.write("    " + line[6:])
+            f2.write(" " * (count + offset) + line[6:])
 
             # check if proof line has finished
-            if(not line.endswith(";\n")):
+            if(";" not in line):
                 copyNextLine = True
 
-    f2.write("\n}")
-
-    # relocating the cursor of the files at the beginning
-    f1.seek(0)
-    f2.seek(0)
-
-    
-    # closing the files
-    f1.close()
-    f2.close()
-
-    print("The converted file is called " + secondfile)
-
-def convertMultipleFiles(firstfile, folder):
-    
-    secondfile = folder + "\\" + firstfile.split('.')[0].split('\\')[-1] + "_calc.dfy"
-
-    # opening first file in append mode and second file in read mode
-    f1 = open(firstfile, 'r')
-    f2 = open(secondfile, 'a+')
-    
-    # appending the contents of the second file to the first file
-    f2.write("calc == {\n")
-
-    # read content from first file
-    for line in f1:
-
-        # check of line is a proof
-        if(line.startswith("proof ")):  
-            # append content to second file
-            f2.write("    " + line[6:])
-
-    f2.write("\n}")
+    f2.write("}")
 
     # relocating the cursor of the files at the beginning
     f1.seek(0)
