@@ -1,0 +1,9 @@
+function method More(x: int): int 
+    // ensures x < More(x)
+{   
+    
+    if x <= 0 then 1 else More(x - 2) + 3
+}
+
+lemma Increasing(x: int)
+    ensures x < More(x)
