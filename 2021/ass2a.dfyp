@@ -1,0 +1,59 @@
+function fusc(n: int): int
+
+method ComputeFusc(N: int) returns (b: int)
+    requires N >= 0
+    ensures b == fusc(N)
+{
+    proof N >= 0;
+    proof fusc(N) == 1 * fusc(N) + 0 * fusc(N + 1) && N >= 0;
+    b := 0;
+    proof fusc(N) == 1 * fusc(N) + b * fusc(N + 1) && N >= 0;
+    proof forall n: int, a: int :: fusc(N) == 1 * fusc(N) + b * fusc(N + 1) && N >= 0;
+    var n, a := N, 1;
+    proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0;
+    while n != 0
+        invariant fusc(N) == a * fusc(n) + b * fusc(n + 1)
+        invariant n >= 0
+        decreases n 
+    {
+        proof n != 0 && fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0;
+        proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && n > 0;
+        proof forall d: int :: fusc(N) == a * fusc(n) + b * fusc(n + 1) && n > 0;
+        proof forall d :: (n % 2 == 0 ==> a * fusc(n) + b * fusc(n + 1) && n > 0) &&
+            (n % 2 != 0 ==> a * fusc(n) + b * fusc(n + 1) && n > 0);
+        ghost var d := n;
+        proof (n % 2 == 0 ==> a * fusc(n) + b * fusc(n + 1) && d > n / 2 >= 0) &&
+            (n % 2 != 0 ==> a * fusc(n) + b * fusc(n + 1) && d > (n - 1) / 2 >= 0);
+        if n % 2 == 0 {
+            proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n / 2 >= 0;
+            proof fusc(N) == a * fusc(2 * n / 2) + //rule (iii)
+                b * fusc( 2 * n / 2 + 1) && //rule (iv) 5
+                d > n / 2 >= 0;
+            proof fusc(N) == a * fusc(n / 2) + b * (fusc(n / 2) + fusc(n / 2 + 1));
+            proof fusc(N) == (a + b) * fusc(n / 2) + b * fusc(n / 2 + 1) && d > n / 2 >= 0;
+            a := a + b;
+            proof fusc(N) == a * fusc(n / 2) + b * fusc(n / 2 + 1) && d > n / 2 >= 0;
+            n := n / 2;
+            proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n >= 0;
+        } else {
+            proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > (n - 1) / 2 >= 0;
+            proof fusc(N) == a * fusc(2 * (n - 1) / 2 + 1) + //rule (iv) 8
+                b * fusc(2 * (n + 1) / 2) && //rule (iii) 9
+                d > (n - 1) / 2 >= 0;
+            proof fusc(N) == a * (fusc((n - 1) / 2) + fusc((n - 1) / 2 + 1)) + b * ((n + 1) / 2) &&
+                d > (n - 1) / 2 >= 0;
+            proof fusc(N) == a * fusc((n - 1) / 2) + (b + a) * fusc((n - 1) / 2 + 1) &&
+                d > (n - 1) / 2 >= 0;
+            b := b + a;
+            proof fusc(N) == a * fusc((n - 1) / 2) + b * fusc((n - 1) / 2 + 1) &&
+                d > (n - 1) / 2 >= 0;
+            n := (n - 1) / 2;
+            proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n >= 0;
+        }
+        proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n >= 0;
+        proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0 && d > n && d >= 0;
+    }
+    proof n == 0 && fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0;
+    //strengthening (by introducing n == 0), rules (i) and (ii)
+    proof b == fusc(N);
+}

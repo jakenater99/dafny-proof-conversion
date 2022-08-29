@@ -16,6 +16,7 @@ def convertSingleFile():
     # entering the file names
     firstfile = input("Enter the name of the file to convert: ")
     secondfile = firstfile.split('.')[0] + "_calc.dfyp"
+    assistfile = input("Enter the name of the file to assit the conversion: ")
 
     # enter the directory to store the conversion
     #directory = input("Enter the name of directory to save the conversion to (enter nothing to be saved in currect directory): ")
@@ -23,14 +24,15 @@ def convertSingleFile():
     # opening first file in append mode and second file in read mode
     f1 = open(firstfile, 'r')
     f2 = open(secondfile, 'a+')
+    f3 = open(assistfile, 'r')
 
     # convert f1 into f2
-    convertFile(f1, f2)
+    convertFile(f1, f2, f3)
 
     print("The converted file is called " + secondfile)
 
 
-def convertMultipleFiles(firstfile, folder):
+def convertMultipleFiles(firstfile, folder, assistfile):
     
     secondfile = folder + "\\" + firstfile.split('.')[0].split('\\')[-1] + "_calc.dfyp"
 
@@ -38,12 +40,13 @@ def convertMultipleFiles(firstfile, folder):
     # opening first file in append mode and second file in read mode
     f1 = open(firstfile, 'r')
     f2 = open(secondfile, 'a+')
+    f3 = open(assistfile, 'r')
 
     # convert f1 into f2
-    convertFile(f1, f2)
+    convertFile(f1, f2, f3)
 
 
-def convertFile(f1, f2):
+def convertFile(f1, f2, f3):
 
     # appending the contents of the second file to the first file
     f2.write("calc == {\n")
@@ -104,6 +107,7 @@ def convertFolder():
     # entering the file names
     firstfolder = input("Enter the name of the folder to convert: ")
     secondfolder = firstfolder + "_calc"
+    assistfile = input("Enter the name of the file to assit the conversion: ")
 
     # Check whether the specified path exists or not
     isExist = os.path.exists(secondfolder)

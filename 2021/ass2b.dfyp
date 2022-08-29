@@ -1,0 +1,37 @@
+function fusc(n: int): int
+
+method ComputeFusc(N: int) returns (b: int)
+    requires N >= 0
+    ensures b == fusc(N)
+
+method ComputePos(num: int, den: int) returns (n: int)
+    requires num > 0 && den > 0
+    ensures n > 0 && num == fusc(n) && den == fusc(n+1)
+{
+    proof true; //rules (ii) and (iii)
+    proof 1 > 0 && 1 == fusc(1) && 1 == fusc(2);
+    n := 1;
+    proof n > 0 && 1 == fusc(n) && 1 == fusc(n + 1);
+    proof forall a: int, b: int :: n > 0 && 1 == fusc(n) && 1 == fusc(n + 1);
+    var a, b := 1, 1; 
+    proof n > 0 && a == fusc(n) && b == fusc(n + 1);
+    while (a != num || b != den)
+        invariant n > 0 && a == fusc(n) && b == fusc(n + 1) 
+        decreases a -
+    {
+        proof n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1);
+        //strengthening 3
+        proof n + 1 > 0 && b == fusc(n+1);
+        a := b; 
+        proof n + 1 > 0 && a == fusc(n + 1); //one-point rule 5
+        proof n + 2 > 0 &&
+            forall b' :: b' == fusc(n + 2) ==> n + 1 > 0 && a == fusc(n + 1) && b' == fusc(n + 2);
+        b := ComputeFusc(n + 2); 
+        proof n + 1 > 0 && a == fusc(n + 1) && b == fusc(n + 2);
+        n := n + 1;
+        proof n > 0 && a == fusc(n) && b == fusc(n + 1);
+    }
+proof n > 0 && a == num && b == den && a == fusc(n) && b == fusc(n + 1);
+//strengthening (by introducing a == num && b == den) 8
+proof n > 0 && num == fusc(n) && den == fusc(n + 1);
+}

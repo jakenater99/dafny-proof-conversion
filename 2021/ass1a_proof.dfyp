@@ -1,0 +1,69 @@
+function method gcd(a:int, b:int): int
+
+lemma gcd1(a:int, b:int)
+    ensures gcd(a, 0) == 0
+
+lemma gcd2(a:int, b:int)
+    ensures gcd(a, a) == a
+
+lemma gcd3(a:int, b:int)
+    ensures gcd(a, b) == gcd(b, a)
+
+lemma gcd4(a:int, b:int)
+    ensures b > 0 ==> gcd(a, b) == gcd(b, a % b)
+
+method GCD1(a: int, b: int) returns (r: int)
+    requires a > 0 && b > 0 
+    ensures r == gcd(a, b) 
+    decreases b //note that a % b < b
+{   
+    gcd1(a, b);
+    gcd2(a, b);
+    gcd3(a, b);
+    gcd4(a, b);
+    calc ==> {
+        b > 0 && a > 0 && (a % b == 0 ==> b == gcd(a, b)) &&
+            (a % b != 0 ==> a % b > 0 && gcd(b, a % b) == gcd(a, b)); //strengthening
+        (a < b ==> b > 0 && a > 0) &&
+            (a >= b ==> (a % b == 0 ==> b == gcd(a, b)) &&
+            (a % b != 0 ==> b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b)));
+    }
+    if a < b {
+        calc ==> {
+            b > 0 && a > 0;  //rule (iii)
+            b > 0 && a > 0 && gcd(b, a) == gcd(a, b); //one-point rule
+            b > 0 && a > 0 && forall r' :: r' == gcd(b, a) ==> r' == gcd(a, b); 
+        }
+        r := GCD1(b, a);
+        calc ==> {
+            r == gcd(a, b);
+        } 
+    } else {
+        calc ==> {
+            (a % b == 0 ==> b == gcd(a, b)) &&
+                (a % b != 0 ==> b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b));
+        }
+        if (a % b == 0) {
+            calc ==> {
+                b == gcd(a, b); 
+            }
+            r := b;
+            calc ==> {
+                r == gcd(a, b);
+            }
+        } else {
+            calc ==> {
+                b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b); //one-point rule
+                b > 0 && a % b > 0 && forall r' :: r' == gcd(b, a % b) ==> r' == gcd(a, b); 
+            }
+            r := GCD1(b, a % b);
+            calc ==> {
+                r == gcd(a, b);
+            }
+        }
+        calc ==> {
+            r == gcd(a, b);
+        }
+    }
+}
+
