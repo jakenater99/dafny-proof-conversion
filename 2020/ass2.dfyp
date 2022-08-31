@@ -1,0 +1,46 @@
+method mult2(X: int, Y: int) returns (r: int)
+    requires X >= 0 && Y >= 0
+    ensures r == X * Y
+{
+    proof Y >= 1;
+    proof X * Y == X * Y && Y >= 1;
+    proof forall x: int, y: int, c:int :: X * Y == X * Y && Y >= 1;
+    var x, y, c := X, Y, 0;
+    proof x * y + c == X * Y && y >= 1;
+    while y > 1
+        invariant x * y + c == X * Y && y >= 1
+        decreases y
+    {   
+        proof x * y + c == X * Y && y >= 1 && y > 1;
+        proof x * y + c == X * Y && (y % 2 == 0 ==> y > 1) && (y % 2 != 0 ==> y > 1);
+        proof x * y + c == X * Y && (y % 2 == 0 ==> y >= 2) && (y % 2 != 0 ==> y >= 3);
+        proof (y % 2 == 0 ==> x * y + c == X * Y && y >= 2 && true) &&
+            (y % 2 != 0 ==> x * y + c == X * Y && y >= 3 && true);
+        proof (y % 2 == 0 ==> x * y + c == X * Y && y >=2 && y > y/2) &&
+            (y % 2 != 0 ==> x * y + c == X * Y && y >= 3 && y > (y-1)/2);
+        ghost var d := y;
+        proof (y % 2 == 0 ==> x * y + c == X * Y && y >=2 && d > y/2) &&
+            (y % 2 != 0 ==> x * y + c == X * Y && y >= 3 && d > (y-1)/2);
+        if y % 2 == 0 {
+            proof x * y + c == X * Y && y >= 2 && d > y/2;
+            proof 2 * x * y/2 + c == X * Y && y/2 >= 1 && d > y/2;
+            y := y/2;
+            proof 2 * x * y + c == X * Y && y >= 1 && d > y;
+        } else {
+            proof x * y + c == X * Y && y >= 3 && d > (y-1)/2;
+            proof x * (y-1) + c + x == X * Y && y >= 3 && d > (y-1)/2;
+            proof 2 * x * (y-1)/2 + c + x == X * Y && (y-1)/2 >= 1 && d > (y-1)/2;
+            y := (y-1)/2;
+            proof 2 * x * y + c + x == X * Y && y >= 1 && d > y;
+            c := c + x;
+            proof 2 * x * y + c == X * Y && y >= 1 && d > y;
+        }
+        proof 2 * x * y + c == X * Y && y >= 1 && d > y;
+        x := 2*x;
+        proof x * y + c == X * Y && y >= 1 && d > y;
+    }
+    proof x * y + c == X * Y && y >= 1 && y <= 1;
+    proof x + c == X * Y;
+    r := x + c;
+    proof r == X * Y;
+}

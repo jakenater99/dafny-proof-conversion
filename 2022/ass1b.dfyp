@@ -1,0 +1,25 @@
+method ExpK(a: int, n: nat) returns (z: int) 
+{
+    z := 1;
+    var i := n;
+    while (i > 0)
+        invariant z * ai == an && i >= 0
+    {
+        proof (i%2 != 0 ==> z * ai == an && i >= 1) &&
+            (i % 2 == 0 ==> z * z * ai/2 == an && i/2 >= 0);
+        if i % 2 != 0 {
+            proof z * ai == an && i >= 1;
+            proof z * ai == an && i - 1 >= 0; //(an+1 == a*an)
+            proof z * a * ai-1 == an && i - 1 >= 0;
+            z, i := z * a, i - 1;
+            proof z * ai == an && i >= 0;
+        } else {
+            proof z * z * ai/2 == an && i/2 >= 0;
+            z, i := z * z, i / 2;
+            proof z * ai == an && i >= 0;
+        }
+        proof z * ai == an && i >= 0;
+    }
+    proof z * ai == an && i >= 0 && i <= 0; //(strengthening)
+    proof z == an;
+}

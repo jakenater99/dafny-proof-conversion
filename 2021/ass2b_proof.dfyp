@@ -20,10 +20,6 @@ method ComputePos(num: int, den: int) returns (n: int)
     requires num > 0 && den > 0
     ensures n > 0 && num == fusc(n) && den == fusc(n+1)
 {
-    fusc1(N);
-    fusc2(N);
-    fusc3(N);
-    fusc4(N);
     calc ==> {
         true; //rules (ii) and (iii)
         1 > 0 && 1 == fusc(1) && 1 == fusc(2);
@@ -39,7 +35,7 @@ method ComputePos(num: int, den: int) returns (n: int)
     }
     while (a != num || b != den)
         invariant n > 0 && a == fusc(n) && b == fusc(n + 1) 
-        decreases 
+        decreases num, den
     {
         calc ==> {
             n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1);

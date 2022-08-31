@@ -1,0 +1,26 @@
+method Abs(x: int) returns (y: int)
+    ensures y >= 0 && (y == x || y == -x)
+
+method Main(u: int) returns (t: int)
+    requires u != 0
+    ensures t > u
+{
+    calc ==> {
+        u != 0;
+        !(u == 0); //(A.1)
+        !(u == 0) && !(u == 0);
+        !(u >= 0 && u <= 0) && !(u <= 0 && u >= 0);
+        !(7*u >= 0 && u >= 7*u) && !(-7*u >= 0 && u >= -7*u); //(A.24)
+        (7*u >=0 ==> u < 7*u) && (-7*u >=0 ==> u < -7*u); //(A.56)
+        (forall y':: (y'==7*u ==> (y'>=0 ==> u < y'))) &&
+            (forall y':: (y'==-7*u ==> (y'>=0 ==> u < y'))); //(A.65)
+        forall y':: (y'==7*u ==> (y'>=0 ==> u < y')) && (y'==-7*u ==> (y'>=0 ==> u < y')); //(A.37)
+        forall y':: ((y'>=0 && y'==7*u) ==> u < y') && ((y'>=0 && y'== -7*u) ==> u < y'); //(A.34)
+        forall y' :: (y'>=0 && y'==7*u) || (y'>=0 && y'== -7*u) ==> u < y'; //(A.9, A.7)
+        true && forall y' :: y' >= 0 && (y' == 7*u || y' == -7 * u) ==> u < y';
+    }
+    t := Abs(7 * u);
+    calc ==> {
+        u < t;
+    }
+}

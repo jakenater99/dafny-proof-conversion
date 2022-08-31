@@ -1,0 +1,73 @@
+method mult2(X: int, Y: int) returns (r: int)
+    requires X >= 0 && Y >= 0
+    ensures r == X * Y
+{
+    calc ==> {
+        Y >= 1;
+        X * Y == X * Y && Y >= 1;
+        forall x: int, y: int, c:int :: X * Y == X * Y && Y >= 1;
+    }
+    var x, y, c := X, Y, 0;
+    calc ==> {
+        x * y + c == X * Y && y >= 1;
+    }
+    assume y >= 1;
+    while y > 1
+        invariant x * y + c == X * Y && y >= 1
+        decreases y
+    {   
+        calc ==> {
+            x * y + c == X * Y && y >= 1 && y > 1;
+            x * y + c == X * Y && (y % 2 == 0 ==> y > 1) && (y % 2 != 0 ==> y > 1);
+            x * y + c == X * Y && (y % 2 == 0 ==> y >= 2) && (y % 2 != 0 ==> y >= 3);
+            (y % 2 == 0 ==> x * y + c == X * Y && y >= 2 && true) &&
+                (y % 2 != 0 ==> x * y + c == X * Y && y >= 3 && true);
+            (y % 2 == 0 ==> x * y + c == X * Y && y >=2 && y > y/2) &&
+                (y % 2 != 0 ==> x * y + c == X * Y && y >= 3 && y > (y-1)/2);
+        }
+        ghost var d := y;
+        calc ==> {
+            (y % 2 == 0 ==> x * y + c == X * Y && y >=2 && d > y/2) &&
+                (y % 2 != 0 ==> x * y + c == X * Y && y >= 3 && d > (y-1)/2);
+        }
+        if y % 2 == 0 {
+            calc ==> {
+                x * y + c == X * Y && y >= 2 && d > y/2;
+                2 * x * y/2 + c == X * Y && y/2 >= 1 && d > y/2;
+            }
+            y := y/2;
+            calc ==> {
+                2 * x * y + c == X * Y && y >= 1 && d > y;
+            }
+        } else {
+            calc ==> {
+                x * y + c == X * Y && y >= 3 && d > (y-1)/2;
+                x * (y-1) + c + x == X * Y && y >= 3 && d > (y-1)/2;
+                2 * x * (y-1)/2 + c + x == X * Y && (y-1)/2 >= 1 && d > (y-1)/2;
+            }
+            y := (y-1)/2;
+            calc ==> {
+                2 * x * y + c + x == X * Y && y >= 1 && d > y;
+            }
+            c := c + x;
+            calc ==> {
+                2 * x * y + c == X * Y && y >= 1 && d > y;
+            }
+        }
+        calc ==> {
+            2 * x * y + c == X * Y && y >= 1 && d > y;
+        }
+        x := 2*x;
+        calc ==> {
+            x * y + c == X * Y && y >= 1 && d > y;
+        }
+    }
+    calc ==> {
+        x * y + c == X * Y && y >= 1 && y <= 1;
+        x + c == X * Y;
+    }
+    r := x + c;
+    calc ==> {
+        r == X * Y;
+    }
+}

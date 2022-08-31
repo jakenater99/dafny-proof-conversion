@@ -17,7 +17,7 @@ method ComputePos(num: int, den: int) returns (n: int)
     proof n > 0 && a == fusc(n) && b == fusc(n + 1);
     while (a != num || b != den)
         invariant n > 0 && a == fusc(n) && b == fusc(n + 1) 
-        decreases a -
+        decreases a
     {
         proof n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1);
         //strengthening 3
