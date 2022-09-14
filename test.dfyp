@@ -1,8 +1,34 @@
-proof true;
-proof 72 <
-     100;
-proof 32 + 40 < 100;
-x := 32;
-proof x + 40 < 100;
-y := 40;
-proof x + y < 100;
+function gcd(a:int, b:int): int
+
+method GCD1(a: int, b: int) returns (r: int)
+    requires a > 0 && b > 0 
+    ensures r == gcd(a, b) 
+    decreases b //note that a % b < b
+{
+    proof b > 0 && a > 0 && (a % b == 0 ==> b == gcd(a, b)) &&
+        (a % b != 0 ==> a % b > 0 && gcd(b, a % b) == gcd(a, b)); //strengthening // proof 1.1
+    proof (a < b ==> b > 0 && a > 0) &&
+        (a >= b ==> (a % b == 0 ==> b == gcd(a, b)) &&
+        (a % b != 0 ==> b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b))); // proof 1.2
+    if a < b {
+        proof b > 0 && a > 0;  //rule (iii) // proof 2.1
+        proof b > 0 && a > 0 && gcd(b, a) == gcd(a, b); //one-point rule // proof 2.2
+        proof b > 0 && a > 0 && forall r' :: r' == gcd(b, a) ==> r' == gcd(a, b); // proof 2.3
+        r := GCD1(b, a);
+        proof r == gcd(a, b); // proof 3.1
+    } else {
+        proof (a % b == 0 ==> b == gcd(a, b)) &&
+            (a % b != 0 ==> b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b)); // proof 4.1
+        if (a % b == 0) {
+            proof b == gcd(a, b); // proof 5.1
+            r := b;
+            proof r == gcd(a, b); // proof 6.1
+        } else {
+            proof b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b); //one-point rule // proof 7.1
+            proof b > 0 && a % b > 0 && forall r' :: r' == gcd(b, a % b) ==> r' == gcd(a, b); // proof 7.2
+            r := GCD1(b, a % b);
+            proof r == gcd(a, b); // proof 8.1
+        }
+        proof r == gcd(a, b); // proof 9.1
+    }
+}

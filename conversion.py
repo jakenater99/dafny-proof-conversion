@@ -16,7 +16,7 @@ def convertSingleFile():
     # entering the file names
     firstfile = input("Enter the name of the file to convert: ")
     secondfile = firstfile.split('.')[0] + "_calc.dfyp"
-    assistfile = input("Enter the name of the file to assit the conversion: ")
+    convertfile = input("Enter the name of the file to convert to: ")
 
     # enter the directory to store the conversion
     #directory = input("Enter the name of directory to save the conversion to (enter nothing to be saved in currect directory): ")
@@ -24,7 +24,7 @@ def convertSingleFile():
     # opening first file in append mode and second file in read mode
     f1 = open(firstfile, 'r')
     f2 = open(secondfile, 'a+')
-    f3 = open(assistfile, 'r')
+    f3 = open(convertfile, 'r')
 
     # convert f1 into f2
     convertFile(f1, f2, f3)
@@ -48,66 +48,147 @@ def convertMultipleFiles(firstfile, folder, assistfile):
 
 def convertFile(f1, f2, f3):
 
+    #
+
     # appending the contents of the second file to the first file
-    f2.write("calc == {\n")
+    f2.write("// This proves whether the students wp proof is correct\n\n")
 
-    copyNextLine = False
-    firstLine = True
-    offset = 0
+    calcBody = False
+    prevLine = ""
+    whiteSpaces = 0
+    firstProof = True
+    elseSkips = 0
+    lbraceSkips = 0
+    rbraceSkips = 0
+    lemmas = []
     # read content from first file
-    for line in f1:
-        
-        # count number of whitespaces
-        count = 0
-        for char in line:
-            if(char != " "):
+    for line in f3:
+
+        if "lemma" in line.strip():
+            lemmas.append(line.replace(" ", "")[5:].split('(')[0])
+
+        hasLemma = False
+        for lemma in lemmas:
+            if lemma in line.strip():
+                print("LEMMA " + lemma + " " + prevLine)
+                hasLemma = True
                 break
-            count += 1 
 
-        # removes all whitespaces from leading and trailing ends
-        line = line.strip() + "\n"
+        if hasLemma:
+            f2.write(line)
+            continue
 
-        # offset all lines according to the first proof    
-        if(line.startswith("proof ") and firstLine is True):
-            if(count < 4):
-                offset = 4 - count
-            if(count > 4):
-                offset = count - 4
-            firstLine = False
+        if calcBody and not line.strip().startswith("}"):
+            continue
 
-        # copy the next line if the proof stmt is on multiple lines
-        if(copyNextLine):
-            f2.write(" " * (count + offset) + line)
+        if line.strip().startswith("}"):
+            calcBody = False
 
-            # check if proof line has finished
-            if(";" in line):
-                copyNextLine = False
+        if line.strip().startswith("calc ==> {"):
+            f2.write(line)
+            calcBody = True
 
-        # check if line is a proof
-        if(line.startswith("proof ")):  
-            # append content to second file
-            f2.write(" " * (count + offset) + line[6:])
+        whiteSpaces = len(line) - len(line.strip()) - 1
 
-            # check if proof line has finished
-            if(";" not in line):
-                copyNextLine = True
+        if not calcBody:
+            f2.write(line)
+        else:
+            if firstProof:
+                prevLine = "{"
+                print(lemmas)
+            print("calc " + str(whiteSpaces) + " " + prevLine)
+            match = False
+            proof = False
+            elsesToSkip = elseSkips
+            lbracesToSkip = lbraceSkips
+            rbracesToSkip = rbraceSkips
+            for line in f1:
+                if match:
+                    print("Here + " + line.strip() + " + " + str(proof))
+                    if line.strip()[:2] == "//":
+                        f2.write(' ' * (whiteSpaces + 4) + line.strip() + "\n")
+                        continue
 
-    f2.write("}")
+                    if not line.strip().startswith("proof ") and not proof:
+                        f1.seek(0)
+                        break
+
+                    if line.strip().startswith("proof ") and ";" not in line.strip():
+                        f2.write(' ' * (whiteSpaces + 4) + line.strip()[6:] + "\n")
+                        proof = True
+                        continue
+
+                    if line.strip().startswith("proof ") and ";" in line.strip():
+                        f2.write(' ' * (whiteSpaces + 4) + line.strip()[6:] + "\n")
+                        continue
+                       
+                    if ";" in line.strip() and proof:
+                        f2.write(' ' * (whiteSpaces + 8) + line.strip() + "\n")
+                        proof = False
+                        if len(line.strip().split(';')) > 1:
+                            print("STRENGTHEN")
+                            if "strengthening" in line.strip().split(';')[1].lower():
+                                f2.write(' ' * (whiteSpaces + 4) + "==\n")
+                        continue
+                    
+                    if ";" not in line.strip() and proof:
+                        f2.write(' ' * (whiteSpaces + 8) + line.strip() + "\n")
+                        continue
+                
+                print(line.strip() + " AND " + prevLine)
+
+                if line.strip().replace(" ", "") == "}else{":
+                    print("ELSESKIP " + str(elsesToSkip))
+                    if elsesToSkip > 0:
+                        elsesToSkip -= 1
+                        continue 
+
+                if line.strip().replace(" ", "") == "{":
+                    print("LBRACESKIP " + str(elsesToSkip))
+                    if lbracesToSkip > 0:
+                        lbracesToSkip -= 1
+                        continue 
+                
+                if line.strip().replace(" ", "") == "}":
+                    print("LBRACESKIP " + str(elsesToSkip))
+                    if rbracesToSkip > 0:
+                        rbracesToSkip -= 1
+                        continue
+                
+                if firstProof:
+                    print("match1")
+                    firstProof = False
+
+                if line.strip() == prevLine:
+                    print("match2")
+                    if line.strip().replace(" ", "") == "}else{":
+                        print("ELSE")
+                        elseSkips += 1
+                    if line.strip().replace(" ", "") == "{":
+                        print("LBRACE")
+                        lbraceSkips += 1
+                    if line.strip().replace(" ", "") == "}":
+                        print("ELSE")
+                        rbraceSkips += 1
+                    match = True
+
+        prevLine = line.strip()
 
     # relocating the cursor of the files at the beginning
     f1.seek(0)
     f2.seek(0)
-
+    f3.seek(0)
     
     # closing the files
     f1.close()
     f2.close()
+    f3.close()
 
 def convertFolder():
     # entering the file names
     firstfolder = input("Enter the name of the folder to convert: ")
     secondfolder = firstfolder + "_calc"
-    assistfile = input("Enter the name of the file to assit the conversion: ")
+    convertfile = input("Enter the name of the file to assit the conversion: ")
 
     # Check whether the specified path exists or not
     isExist = os.path.exists(secondfolder)

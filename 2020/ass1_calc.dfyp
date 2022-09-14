@@ -1,0 +1,48 @@
+// This proves whether the students wp proof is correct
+
+method mult(x: int, y: int) returns (r: int)
+    requires x >=0 && y >= 0
+    ensures r == x * y
+    decreases y, x
+{
+    calc ==> {
+        x >= 0 && y >= 0;
+    }
+    if x < y {
+        calc ==> {
+            x >= 0 && y >= 0;
+            y >= 0 && x >= 0 && forall r' :: r' == y * x ==> r' == x * y;
+        }
+        r := mult(y, x);
+        calc ==> {
+            r == x * y;
+            y == 0 || (x >= 0 && y > 0);
+            (y != 0 ==> x >= 0 && y > 0) && (y == 0 ==> x * y == 0);
+        }
+    } else if y !=0 {
+        calc ==> {
+            x >= 0 && y > 0;
+            x >= 0 && y-1 >= 0 && x * (y-1) + x == x * y;
+            x >= 0 && y-1 >= 0 && forall r' :: r' == x * (y-1) ==> r' + x == x * y;
+        }
+        r := mult(x, y-1);
+        calc ==> {
+            r + x == x * y;
+        }
+        r := r + x;
+        calc ==> {
+            r == x * y;
+        }
+    } else {
+        calc ==> {
+            x * y == 0;
+        }
+        r := 0;
+        calc ==> {
+            r == x * y;
+        }
+    }
+    calc ==> {
+        r == x * y;
+    }
+}

