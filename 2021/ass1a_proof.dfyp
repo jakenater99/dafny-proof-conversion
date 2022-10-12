@@ -21,7 +21,7 @@ method GCD1(a: int, b: int) returns (r: int)
     gcd2(a, b);
     gcd3(a, b);
     gcd4(a, b);
-    calc ==> {
+    calc == {
         b > 0 && a > 0 && (a % b == 0 ==> b == gcd(a, b)) &&
             (a % b != 0 ==> a % b > 0 && gcd(b, a % b) == gcd(a, b)); //strengthening
         (a < b ==> b > 0 && a > 0) &&
@@ -29,39 +29,39 @@ method GCD1(a: int, b: int) returns (r: int)
             (a % b != 0 ==> b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b)));
     }
     if a < b {
-        calc ==> {
+        calc == {
             b > 0 && a > 0;  //rule (iii)
             b > 0 && a > 0 && gcd(b, a) == gcd(a, b); //one-point rule
             b > 0 && a > 0 && forall r' :: r' == gcd(b, a) ==> r' == gcd(a, b); 
         }
         r := GCD1(b, a);
-        calc ==> {
+        calc == {
             r == gcd(a, b);
         } 
     } else {
-        calc ==> {
+        calc == {
             (a % b == 0 ==> b == gcd(a, b)) &&
                 (a % b != 0 ==> b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b));
         }
         if (a % b == 0) {
-            calc ==> {
+            calc == {
                 b == gcd(a, b); 
             }
             r := b;
-            calc ==> {
+            calc == {
                 r == gcd(a, b);
             }
         } else {
-            calc ==> {
+            calc == {
                 b > 0 && a % b > 0 && gcd(b, a % b) == gcd(a, b); //one-point rule
                 b > 0 && a % b > 0 && forall r' :: r' == gcd(b, a % b) ==> r' == gcd(a, b); 
             }
             r := GCD1(b, a % b);
-            calc ==> {
+            calc == {
                 r == gcd(a, b);
             }
         }
-        calc ==> {
+        calc == {
             r == gcd(a, b);
         }
         assume r == gcd(a, b);

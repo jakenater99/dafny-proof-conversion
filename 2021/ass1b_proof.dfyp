@@ -21,29 +21,29 @@ method GCD2(a: int, b: int) returns (r: int)
     gcd2(a, b);
     gcd3(a, b);
     gcd4(a, b);
-    calc ==> {
+    calc == {
         (b == 0 ==> a == gcd(a, b)) &&
             (b != 0 ==> b >= 0 && a % b >= 0 && gcd(b, a % b) == gcd(a, b));
     }
     if b == 0 {
-        calc ==> {
+        calc == {
             a == gcd(a, b);
         }
         r := a;
-        calc ==> {
+        calc == {
             r == gcd(a, b);
         }
     } else {
-        calc ==> {
+        calc == {
             b >= 0 && a % b >= 0 && gcd(b, a % b) == gcd(a, b); //one-point rule
             b >= 0 && a % b >= 0 && forall r' :: r' == gcd(b, a % b) ==> r' == gcd(a, b);
         }
         r := GCD2(b, a % b);
-        calc ==> {
+        calc == {
             r == gcd(a, b);
         }
     }
-    calc ==> {
+    calc == {
         r == gcd(a, b);
     }
     assume r == gcd(a, b);

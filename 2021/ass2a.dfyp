@@ -59,7 +59,6 @@ method ComputeFusc(N: int) returns (b: int)
         proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n >= 0; // 12.1
         proof fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0 && d > n && d >= 0; // 12.2
     }
-    proof n == 0 && fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0; // 13.1
-    //strengthening (by introducing n == 0), rules (i) and (ii)
+    proof n == 0 && fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0; // 13.1 strengthening (by introducing n == 0), rules (i) and (ii)
     proof b == fusc(N); // 13.2
 }

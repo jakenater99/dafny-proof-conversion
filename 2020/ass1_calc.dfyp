@@ -5,44 +5,55 @@ method mult(x: int, y: int) returns (r: int)
     ensures r == x * y
     decreases y, x
 {
-    calc ==> {
+    calc == {
         x >= 0 && y >= 0;
+        // since x >= y && y >= 0 implies x >= 0, and again using the law
+        // (A && B) || (A && C) <==> (A && (B || C))
+        (x >= y && y >= 0) || (x >= 0 && y >= 0 && x < y) || (x >= 0 && y >= 0);
+        // using the law, (A && B) || (A && C) <==> (A && (B || C)), twice
+        false || (x >= y && y == 0) || (x >=y && y >0) ||
+            (x >= 0 && y >= 0 && x < y) || (x >= 0 && y ==0) || (x >= 0 && y > 0);
+        (x >= y && x < y) || (x >= y && y == 0) || (x >=y && y >0) ||
+            (x >= 0 && y >= 0 && x < y) || (x >= 0 && y >= 0 && y ==0) ||
+            (x >= 0 && y >= 0 && y > 0);
+        (x >= y || (x >= 0 && y >= 0)) && (x < y || y == 0 || (x >= 0 && y > 0));
+        (x < y ==> x >= 0 && y >= 0 ) && (x >= y ==> y == 0 || (x >= 0 && y > 0));
     }
     if x < y {
-        calc ==> {
+        calc == {
             x >= 0 && y >= 0;
             y >= 0 && x >= 0 && forall r' :: r' == y * x ==> r' == x * y;
         }
         r := mult(y, x);
-        calc ==> {
+        calc == {
             r == x * y;
             y == 0 || (x >= 0 && y > 0);
             (y != 0 ==> x >= 0 && y > 0) && (y == 0 ==> x * y == 0);
         }
     } else if y !=0 {
-        calc ==> {
+        calc == {
             x >= 0 && y > 0;
             x >= 0 && y-1 >= 0 && x * (y-1) + x == x * y;
             x >= 0 && y-1 >= 0 && forall r' :: r' == x * (y-1) ==> r' + x == x * y;
         }
         r := mult(x, y-1);
-        calc ==> {
+        calc == {
             r + x == x * y;
         }
         r := r + x;
-        calc ==> {
+        calc == {
             r == x * y;
         }
     } else {
-        calc ==> {
+        calc == {
             x * y == 0;
         }
         r := 0;
-        calc ==> {
+        calc == {
             r == x * y;
         }
     }
-    calc ==> {
+    calc == {
         r == x * y;
     }
 }

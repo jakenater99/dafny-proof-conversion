@@ -23,46 +23,46 @@ method ComputePos(num: int, den: int) returns (n: int)
 {
     fusc2();
     fusc3(1);
-    calc ==> {
+    calc == {
         true; //rules (ii) and (iii)
         1 > 0 && 1 == fusc(1) && 1 == fusc(2);
     }
     n := 1;
-    calc ==> {
+    calc == {
         n > 0 && 1 == fusc(n) && 1 == fusc(n + 1);
         forall a: int, b: int :: n > 0 && 1 == fusc(n) && 1 == fusc(n + 1);
     }
     var a, b := 1, 1; 
-    calc ==> {
+    calc == {
         n > 0 && a == fusc(n) && b == fusc(n + 1);
     }
     while (a != num || b != den)
         invariant n > 0 && a == fusc(n) && b == fusc(n + 1) 
         decreases *
     {
-        calc ==> {
-            n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1);
-            //strengthening 3
+        calc == {
+            n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1); //strengthening 3
+        ==>
             n + 1 > 0 && b == fusc(n + 1);
         }
         a := b; 
-        calc ==> {
+        calc == {
             n + 1 > 0 && a == fusc(n + 1); //one-point rule 5
             n + 2 > 0 &&
                 forall b' :: b' == fusc(n + 2) ==> n + 1 > 0 && a == fusc(n + 1) && b' == fusc(n + 2);
         }
         b := ComputeFusc(n + 2); 
-        calc ==> {
+        calc == {
             n + 1 > 0 && a == fusc(n + 1) && b == fusc(n + 2);
         }
         n := n + 1;
-        calc ==> {
+        calc == {
             n > 0 && a == fusc(n) && b == fusc(n + 1);
         }
     }
-    calc ==> {
-        n > 0 && a == num && b == den && a == fusc(n) && b == fusc(n + 1);
-        //strengthening (by introducing a == num && b == den) 8
+    calc == {
+        n > 0 && a == num && b == den && a == fusc(n) && b == fusc(n + 1); //strengthening (by introducing a == num && b == den) 8
+    ==>
         n > 0 && num == fusc(n) && den == fusc(n + 1);
     }
 }

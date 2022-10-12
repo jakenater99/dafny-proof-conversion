@@ -1,5 +1,3 @@
-// This proves whether the students wp proof is correct
-
 function fusc(n: int): int
 
 lemma fusc1()
@@ -43,10 +41,9 @@ method ComputePos(num: int, den: int) returns (n: int)
         decreases *
     {
         calc == {
-            n > 0 && (a != num || b != den) &&
-                a == fusc(n) && b == fusc(n + 1); //strengthening 3
-        ==>
-            n + 1 > 0 && b == fusc(n+1);
+            n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1); //strengthening 3
+            ==>
+            n + 1 > 0 && b == fusc(n + 1);
         }
         a := b; 
         calc == {
@@ -65,7 +62,7 @@ method ComputePos(num: int, den: int) returns (n: int)
     }
     calc == {
         n > 0 && a == num && b == den && a == fusc(n) && b == fusc(n + 1); //strengthening (by introducing a == num && b == den) 8
-    ==>
+        ==>
         n > 0 && num == fusc(n) && den == fusc(n + 1);
     }
 }

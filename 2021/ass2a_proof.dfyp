@@ -20,17 +20,17 @@ method ComputeFusc(N: int) returns (b: int)
     fusc2();
     fusc3(N);
     fusc4(N);
-    calc ==> {
+    calc == {
         N >= 0;
         fusc(N) == 1 * fusc(N) + 0 * fusc(N + 1) && N >= 0;        
     }
     b := 0;
-    calc ==> {
+    calc == {
         fusc(N) == 1 * fusc(N) + b * fusc(N + 1) && N >= 0;
         forall n: int, a: int :: fusc(N) == 1 * fusc(N) + b * fusc(N + 1) && N >= 0;        
     }
     var n, a := N, 1;
-    calc ==> {
+    calc == {
         fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0;
     }
     while n != 0
@@ -38,74 +38,77 @@ method ComputeFusc(N: int) returns (b: int)
         invariant n >= 0
         decreases n 
     {
-        calc ==> {
+        calc == {
             n != 0 && fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0;
             fusc(N) == a * fusc(n) + b * fusc(n + 1) && n > 0;
             forall d: int :: fusc(N) == a * fusc(n) + b * fusc(n + 1) && n > 0;
-            forall d: int :: (n % 2 == 0 ==> fusc(N) == a * fusc(n) + b * fusc(n + 1) && n > 0) &&
-                (n % 2 != 0 ==> fusc(N) == a * fusc(n) + b * fusc(n + 1) && n > 0);        
+            forall d: int :: (n % 2 == 0 ==> fusc(N) == a * fusc(n) + b *
+                fusc(n + 1) && n > 0) && (n % 2 != 0 ==> fusc(N) == a * fusc(n) + 
+                b * fusc(n + 1) && n > 0);
         }
         ghost var d := n;
-        calc ==> {
-            (n % 2 == 0 ==> fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n / 2 >= 0) &&
-                (n % 2 != 0 ==> fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > (n - 1) / 2 >= 0);        
+        calc == {
+            (n % 2 == 0 ==> fusc(N) == a * fusc(n) + b * fusc(n + 1) && 
+                d > n / 2 >= 0) && (n % 2 != 0 ==> fusc(N) == a * fusc(n) + 
+                b * fusc(n + 1) && d > (n - 1) / 2 >= 0);
         }
         if n % 2 == 0 {
             fusc3(n/2);
             fusc4(n/2);
-            calc ==> {
+            calc == {
                 fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n / 2 >= 0;
                 fusc(N) == a * fusc(2 * n / 2) + //rule (iii)
                     b * fusc( 2 * n / 2 + 1) && //rule (iv) 5
                     d > n / 2 >= 0;
                 fusc(N) == a * fusc(n / 2) + b * (fusc(n / 2) + fusc(n / 2 + 1));
-                fusc(N) == (a + b) * fusc(n / 2) + b * fusc(n / 2 + 1) && d > n / 2 >= 0;            
+                fusc(N) == (a + b) * fusc(n / 2) + b * fusc(n / 2 + 1) && 
+                    d > n / 2 >= 0;
             }
             a := a + b;
-            calc ==> {
-                fusc(N) == a * fusc(n / 2) + b * fusc(n / 2 + 1) && d > n / 2 >= 0;
+            calc == {
+                fusc(N) == a * fusc(n / 2) + b * fusc(n / 2 + 1) && 
+                    d > n / 2 >= 0;
             }
             n := n / 2;
-            calc ==> {
+            calc == {
                 fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n >= 0;
             }
         } else {
             fusc3((n+1)/2);
             fusc4((n-1)/2);
-            calc ==> {
+            calc == {
                 fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > (n - 1) / 2 >= 0;
                 fusc(N) == a * fusc(2 * (n - 1) / 2 + 1) + //rule (iv) 8
                     b * fusc(2 * (n + 1) / 2) && //rule (iii) 9
                     d > (n - 1) / 2 >= 0;
-                fusc(N) == a * (fusc((n - 1) / 2) + fusc((n - 1) / 2 + 1)) + b * fusc((n + 1) / 2) &&
-                    d > (n - 1) / 2 >= 0;    
-                fusc(N) == a * fusc((n - 1) / 2) + a * fusc((n - 1) / 2 + 1) + b * fusc((n + 1) / 2) &&
-                    d > (n - 1) / 2 >= 0;
-                fusc(N) == a * fusc((n - 1) / 2) + a * fusc((n - 1) / 2 + 1) + b * fusc((n - 1 + 2) / 2) &&
-                    d > (n - 1) / 2 >= 0;
-                fusc(N) == a * fusc((n - 1) / 2) + a * fusc((n - 1) / 2 + 1) + b * fusc((n - 1) / 2 + 2/2) &&
-                    d > (n - 1) / 2 >= 0;
-                fusc(N) == a * fusc((n - 1) / 2) + (b + a) * fusc((n - 1) / 2 + 1) && 
-                    d > (n - 1) / 2 >= 0;
+                fusc(N) == a * (fusc((n - 1) / 2) + fusc((n - 1) / 2 + 1)) + 
+                    b * fusc((n + 1) / 2) && d > (n - 1) / 2 >= 0;    
+                fusc(N) == a * fusc((n - 1) / 2) + a * fusc((n - 1) / 2 + 1) + 
+                    b * fusc((n + 1) / 2) && d > (n - 1) / 2 >= 0;
+                fusc(N) == a * fusc((n - 1) / 2) + a * fusc((n - 1) / 2 + 1) + 
+                    b * fusc((n - 1 + 2) / 2) && d > (n - 1) / 2 >= 0;
+                fusc(N) == a * fusc((n - 1) / 2) + a * fusc((n - 1) / 2 + 1) + 
+                    b * fusc((n - 1) / 2 + 2/2) && d > (n - 1) / 2 >= 0;
+                fusc(N) == a * fusc((n - 1) / 2) + (b + a) * fusc((n - 1) / 2 + 1)
+                    && d > (n - 1) / 2 >= 0;
             }
             b := b + a;
-            calc ==> {
+            calc == {
                 fusc(N) == a * fusc((n - 1) / 2) + b * fusc((n - 1) / 2 + 1) &&
                     d > (n - 1) / 2 >= 0;
             }
             n := (n - 1) / 2;
-            calc ==> {
+            calc == {
                 fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n >= 0;
             }
         }
-        calc ==> {
+        calc == {
             fusc(N) == a * fusc(n) + b * fusc(n + 1) && d > n >= 0;
             fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0 && d > n && d >= 0;
         }
     }
-    calc ==> {
-        n == 0 && fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0;
-        //strengthening (by introducing n == 0), rules (i) and (ii)
+    calc == {
+        n == 0 && fusc(N) == a * fusc(n) + b * fusc(n + 1) && n >= 0; //strengthening (by introducing n == 0), rules (i) and (ii)
         b == fusc(N);
     }
 }

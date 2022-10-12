@@ -70,7 +70,6 @@ def convertFile(f1, f2, f3):
         hasLemma = False
         for lemma in lemmas:
             if lemma in line.strip():
-                print("LEMMA " + lemma + " " + prevLine)
                 hasLemma = True
                 break
 
@@ -84,7 +83,7 @@ def convertFile(f1, f2, f3):
         if line.strip().startswith("}"):
             calcBody = False
 
-        if line.strip().startswith("calc ==> {"):
+        if line.strip().startswith("calc == {"):
             f2.write(line)
             calcBody = True
 
@@ -95,8 +94,6 @@ def convertFile(f1, f2, f3):
         else:
             if firstProof:
                 prevLine = "{"
-                print(lemmas)
-            print("calc " + str(whiteSpaces) + " " + prevLine)
             match = False
             proof = False
             elsesToSkip = elseSkips
@@ -104,7 +101,6 @@ def convertFile(f1, f2, f3):
             rbracesToSkip = rbraceSkips
             for line in f1:
                 if match:
-                    print("Here + " + line.strip() + " + " + str(proof))
                     if line.strip()[:2] == "//":
                         f2.write(' ' * (whiteSpaces + 4) + line.strip() + "\n")
                         continue
@@ -120,55 +116,47 @@ def convertFile(f1, f2, f3):
 
                     if line.strip().startswith("proof ") and ";" in line.strip():
                         f2.write(' ' * (whiteSpaces + 4) + line.strip()[6:] + "\n")
+                        if len(line.strip().split(';')) > 1:
+                            if "strengthening" in line.strip().split(';')[1].lower():
+                                f2.write(' ' * (whiteSpaces) + "==>\n")
                         continue
                        
                     if ";" in line.strip() and proof:
                         f2.write(' ' * (whiteSpaces + 8) + line.strip() + "\n")
                         proof = False
                         if len(line.strip().split(';')) > 1:
-                            print("STRENGTHEN")
                             if "strengthening" in line.strip().split(';')[1].lower():
-                                f2.write(' ' * (whiteSpaces + 4) + "==\n")
+                                f2.write(' ' * (whiteSpaces) + "==>\n")
                         continue
                     
                     if ";" not in line.strip() and proof:
                         f2.write(' ' * (whiteSpaces + 8) + line.strip() + "\n")
                         continue
-                
-                print(line.strip() + " AND " + prevLine)
 
                 if line.strip().replace(" ", "") == "}else{":
-                    print("ELSESKIP " + str(elsesToSkip))
                     if elsesToSkip > 0:
                         elsesToSkip -= 1
                         continue 
 
                 if line.strip().replace(" ", "") == "{":
-                    print("LBRACESKIP " + str(elsesToSkip))
                     if lbracesToSkip > 0:
                         lbracesToSkip -= 1
                         continue 
                 
                 if line.strip().replace(" ", "") == "}":
-                    print("LBRACESKIP " + str(elsesToSkip))
                     if rbracesToSkip > 0:
                         rbracesToSkip -= 1
                         continue
                 
                 if firstProof:
-                    print("match1")
                     firstProof = False
 
                 if line.strip() == prevLine:
-                    print("match2")
                     if line.strip().replace(" ", "") == "}else{":
-                        print("ELSE")
                         elseSkips += 1
                     if line.strip().replace(" ", "") == "{":
-                        print("LBRACE")
                         lbraceSkips += 1
                     if line.strip().replace(" ", "") == "}":
-                        print("ELSE")
                         rbraceSkips += 1
                     match = True
 
@@ -204,6 +192,6 @@ def convertFolder():
         f = os.path.join(firstfolder, filename)
         # checking if it is a file
         if os.path.isfile(f):
-            convertMultipleFiles(f,secondfolder)
+            convertMultipleFiles(f,secondfolder, convertfile)
     
     print("The converted folder is called " + firstfolder + "_calc")

@@ -1,0 +1,19 @@
+method Demo(x: int) returns (y: int)
+    requires x == 19 || x == 20
+    ensures x + y == 22
+{
+    proof x == 19 || x == 21;
+    proof (x <= 20 == x == 19) && (x >= 20 ==> x == 20);
+    if (x < 20) {
+        proof x == 19;
+        proof x + 3 == 22;
+        y := 3;
+        proof x + y == 22;
+    } else {
+        proof x == 20;
+        proof x + 2 == 22;
+        y := 2;
+        proof x + y == 22;
+    }
+    proof x + y == 22;
+}

@@ -5,7 +5,7 @@ method Main(u: int) returns (t: int)
     requires u != 0
     ensures t > u
 {
-    calc ==> {
+    calc == {
         u != 0;
         !(u == 0); //(A.1)
         !(u == 0) && !(u == 0);
@@ -20,7 +20,7 @@ method Main(u: int) returns (t: int)
         true && forall y' :: y' >= 0 && (y' == 7*u || y' == -7 * u) ==> u < y';
     }
     t := Abs(7 * u);
-    calc ==> {
+    calc == {
         u < t;
     }
 }

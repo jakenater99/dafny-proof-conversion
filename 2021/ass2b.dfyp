@@ -20,8 +20,7 @@ method ComputePos(num: int, den: int) returns (n: int)
         invariant n > 0 && a == fusc(n) && b == fusc(n + 1) 
         decreases *
     {
-        proof n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1);
-        //strengthening 3
+        proof n > 0 && (a != num || b != den) && a == fusc(n) && b == fusc(n + 1); //strengthening 3
         proof n + 1 > 0 && b == fusc(n+1);
         a := b; 
         proof n + 1 > 0 && a == fusc(n + 1); //one-point rule 5
@@ -32,7 +31,6 @@ method ComputePos(num: int, den: int) returns (n: int)
         n := n + 1;
         proof n > 0 && a == fusc(n) && b == fusc(n + 1);
     }
-proof n > 0 && a == num && b == den && a == fusc(n) && b == fusc(n + 1);
-//strengthening (by introducing a == num && b == den) 8
+proof n > 0 && a == num && b == den && a == fusc(n) && b == fusc(n + 1); //strengthening (by introducing a == num && b == den) 8
 proof n > 0 && num == fusc(n) && den == fusc(n + 1);
 }

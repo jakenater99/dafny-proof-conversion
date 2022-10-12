@@ -1,0 +1,10 @@
+method Demo(x: int) returns (y: int)
+    requires x == 19 || x == 20
+    ensures x + y == 22
+{
+    if (x < 20) {
+        y := 3;
+    } else {
+        y := 2;
+    }
+}

@@ -1,0 +1,33 @@
+// This proves whether the students wp proof is correct
+
+method Demo(x: int) returns (y: int)
+    requires x == 19 || x == 20
+    ensures x + y == 22
+{
+    calc == {
+        x == 19 || x == 20;
+        (x < 20 ==> x == 19) && (x >= 20 ==> x == 20);
+    }
+    if (x < 20) {
+        calc == {
+            x == 19;
+            x + 3 == 22;
+        }
+        y := 3;
+        calc == {
+            x + y == 22;
+        }
+    } else {
+        calc == {
+            x == 20;
+            x + 2 == 22;
+        }
+        y := 2;
+        calc == {
+            x + y == 22;
+        }
+    }
+    calc == {
+        x + y == 22;
+    }
+}
