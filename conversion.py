@@ -16,7 +16,7 @@ def convertSingleFile():
     # entering the file names
     firstfile = input("Enter the name of the file to convert: ")
     secondfile = firstfile.split('.')[0] + "_calc.dfyp"
-    convertfile = input("Enter the name of the file to convert to: ")
+    convertfile = input("Enter the name of the file to assist the conversion: ")
 
     # enter the directory to store the conversion
     #directory = input("Enter the name of directory to save the conversion to (enter nothing to be saved in currect directory): ")
@@ -176,7 +176,7 @@ def convertFolder():
     # entering the file names
     firstfolder = input("Enter the name of the folder to convert: ")
     secondfolder = firstfolder + "_calc"
-    convertfile = input("Enter the name of the file to assit the conversion: ")
+    convertfile = input("Enter the name of the file to assist the conversion: ")
 
     # Check whether the specified path exists or not
     isExist = os.path.exists(secondfolder)
