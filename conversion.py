@@ -55,6 +55,7 @@ def convertFile(f1, f2, f3):
 
     calcBody = False
     prevLine = ""
+    prevStatement = ""
     whiteSpaces = 0
     firstProof = True
     elseSkips = 0
@@ -79,10 +80,16 @@ def convertFile(f1, f2, f3):
 
         if calcBody and not line.strip().startswith("}"):
             prevLine = line.strip()
+            if ";" in line.strip() and "{" not in prevStatement and "}" not in prevStatement and prevStatement.count(";") == 0:
+                prevStatement = prevStatement + " \n" + " " * (whiteSpaces + 8) + line.strip()
+            else:
+                if calcBody:
+                    prevStatement = line.strip()
             continue
 
         if calcBody and line.strip().startswith("}"):
-            f2.write(' ' * (whiteSpaces + 4) + prevLine + "\n")
+            f2.write(' ' * (whiteSpaces + 4) + prevStatement + "\n")
+            prevStatement = ""
             calcBody = False
 
         if line.strip().startswith("calc == {"):
@@ -163,6 +170,12 @@ def convertFile(f1, f2, f3):
                     match = True
 
         prevLine = line.strip()
+
+        if ";" in line.strip() and "{" not in prevStatement and "}" not in prevStatement and prevStatement.count(";") == 0:
+            prevStatement = prevStatement + " \n" + " " * (whiteSpaces + 8) + line.strip()
+        else:
+            if calcBody:
+                prevStatement = line.strip()
 
     # relocating the cursor of the files at the beginning
     f1.seek(0)
