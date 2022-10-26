@@ -3,20 +3,20 @@ import os
 def convert():
     # ask user if they want to convert a file or folder
     while True:
-        conversionType = input("Do you want to convert a file or a folder (enter file/folder): ").strip()
-        if(conversionType == "file"):
-            convertSingleFile()
+        # conversionType = input("Do you want to convert a file or a folder (enter file/folder): ").strip()
+        firstfile = input("Enter the name of the file/folder to convert: ").strip()
+        convertfile = input("Enter the name of the file to assist the conversion: ")
+        if "." in firstfile:
+            convertSingleFile(firstfile, convertfile)
             break
-        if(conversionType == "folder"):
-            convertFolder()
+        else:
+            convertFolder(firstfile, convertfile)
             break
 
 
-def convertSingleFile():
-    # entering the file names
-    firstfile = input("Enter the name of the file to convert: ")
+def convertSingleFile(firstfile, convertfile):
+
     secondfile = firstfile.split('.')[0] + "_calc.dfyp"
-    convertfile = input("Enter the name of the file to assist the conversion: ")
 
     # enter the directory to store the conversion
     #directory = input("Enter the name of directory to save the conversion to (enter nothing to be saved in currect directory): ")
@@ -78,9 +78,11 @@ def convertFile(f1, f2, f3):
             continue
 
         if calcBody and not line.strip().startswith("}"):
+            prevLine = line.strip()
             continue
 
-        if line.strip().startswith("}"):
+        if calcBody and line.strip().startswith("}"):
+            f2.write(' ' * (whiteSpaces + 4) + prevLine + "\n")
             calcBody = False
 
         if line.strip().startswith("calc == {"):
@@ -172,11 +174,9 @@ def convertFile(f1, f2, f3):
     f2.close()
     f3.close()
 
-def convertFolder():
-    # entering the file names
-    firstfolder = input("Enter the name of the folder to convert: ")
+def convertFolder(firstfolder, convertfile):
+
     secondfolder = firstfolder + "_calc"
-    convertfile = input("Enter the name of the file to assist the conversion: ")
 
     # Check whether the specified path exists or not
     isExist = os.path.exists(secondfolder)

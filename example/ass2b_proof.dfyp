@@ -50,8 +50,7 @@ method ComputePos(num: int, den: int) returns (n: int)
             n + 1 > 0 && a == fusc(n + 1); //one-point rule 5
             n + 2 > 0 &&
                 forall b' :: b' == fusc(n + 2) ==> n + 1 > 0 && a == fusc(n + 1) && b' == fusc(n + 2);
-        }
-        b := ComputeFusc(n + 2); 
+        }        b := ComputeFusc(n + 2); 
         calc == {
             n + 1 > 0 && a == fusc(n + 1) && b == fusc(n + 2);
         }
